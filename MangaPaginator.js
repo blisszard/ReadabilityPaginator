@@ -241,26 +241,26 @@ function loadScript(url, callback) {
   document.getElementsByTagName("head")[0].appendChild(script);
 }
 
-loadScript("https://cdn.rawgit.com/blisszard/readability/development/Readability.min.js", function() {
-  var loc = document.location;
-  var uri = {
-    spec: loc.href,
-    host: loc.host,
-    prePath: loc.protocol + "//" + loc.host,
-    scheme: loc.protocol.substr(0, loc.protocol.indexOf(":")),
-    pathBase: loc.protocol + "//" + loc.host + loc.pathname.substr(0, loc.pathname.lastIndexOf("/") + 1)
-  };
-  var article = new Readability(uri, document).parse();
-  document.head.innerHTML = '<meta charset="utf-8"><meta name="viewport" content="width=device-width" />';
-  injectJQ();
-  loadScript("https://code.jquery.com/jquery-2.1.0.min.js", function() {
-    jQuery(function($) {
-      document.body.innerHTML = '<div id="readability_article" style="display:none;">' + article.content + '</div>';
-      var content = $('#readability-page-1').html();
-      document.body.innerHTML = '<div id="pager_container" style=""><div id="pages_5NPJADvYjZY" style="right: 0px; ">' + content + '</div></div>';
-      $('.readability-styled').attr('style', '');
-      initStyle();
-      initScript($);
-    });
+
+document.head.innerHTML = '<meta charset="utf-8"><meta name="viewport" content="width=device-width" />';
+// injectJQ();
+loadScript("https://code.jquery.com/jquery-2.1.0.min.js", function() {
+  jQuery(function($) {
+    var $content = $('#vungdoc').children('img').map(function(index, element) {
+      console.log(element.outerHTML);
+      // debugger;
+      return "<p>" + element.outerHTML + "</p>";
+      // return document.createElement("p").innerHTML = element;
+      // return $("#pages_5NPJADvYjZY").append("<div></div>");
+      // return $("<p></p>");
+      // return $("<p></p>").append(element);
+    }).get().join('');
+
+    //   // document.body.innerHTML = '<div id="readability_article" style="display:none;">' + article.content + '</div>';
+    //   // var content = $('#readability-page-1').html();
+    document.body.innerHTML = '<div id="pager_container" style=""><div id="pages_5NPJADvYjZY" style="right: 0px; ">' + $content + '</div></div>';
+    // $('.readability-styled').attr('style', '');
+    initStyle();
+    initScript($);
   });
 });
