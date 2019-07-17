@@ -216,7 +216,7 @@ function initStyle() {
   jQuery(
     function($) {
       $('head').append('<link rel="stylesheet" href="https://use.fontawesome.com/releases/v4.6.3/css/font-awesome-css.min.css" media="all">');
-      $('head').append('<link href="https://cdn.jsdelivr.net/gh/blisszard/readability@development/pager.css" rel="stylesheet">');
+      $('head').append('<link href="https://cdn.jsdelivr.net/gh/blisszard/readability@development/manga.css" rel="stylesheet">');
       $('head').append('<link href="https://cdn.jsdelivr.net/gh/blisszard/readability@development/font_style.css" rel="stylesheet">');
     });
 }
