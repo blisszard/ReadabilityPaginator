@@ -143,6 +143,7 @@ var paginator = function() {
         $('body').append(nextContent);
         var $nextPageUrl = $('.navi-change-chapter-btn-next').attr('href');
         reloadScript();
+        history.pushState({}, null, url);
       }
 
       request.send()
