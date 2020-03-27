@@ -125,9 +125,11 @@ var paginator = function() {
       var $nextPageUrl = $('.navi-change-chapter-btn-next').attr('href');
       document.body.innerHTML = '<div id="pager_container" style=""><div id="pages_5NPJADvYjZY" style="right: 0px; ">' + $content + '</div></div><div id="nextChapterContent"></div><a id="nextPageUrl" href="' + $nextPageUrl + '">Next</a>';
       initPager();
+      nextChapterLoad($('#nextPageUrl').attr('href'));
     }
     $(document).ready(function() {
       initPager();
+      nextChapterLoad($('#nextPageUrl').attr('href'));
     });
 
     function currentWidth() {
@@ -135,23 +137,21 @@ var paginator = function() {
     }
 
     function nextChapter(url) {
+      var $nextPageUrl = $('.navi-change-chapter-btn-next').attr('href');
+      if ($nextPageUrl === undefined) {
+        alert('No More');
+      }
+      reloadScript();
+      history.pushState({}, null, url);
+    }
+
+    function nextChapterLoad(url) {
       var request = new XMLHttpRequest()
       request.open('GET', url, true)
       request.onload = function() {
         nextContent = request.responseText;
         $('#nextChapterContent').html(nextContent);
-        $('#nextChapterContent').ready(function() {
-          $("body").on('DOMSubtreeModified', "#nextChapterContent", function() {
-            var $nextPageUrl = $('.navi-change-chapter-btn-next').attr('href');
-            if ($nextPageUrl === undefined) {
-              alert('No More');
-            }
-            reloadScript();
-          });
-        });
-        history.pushState({}, null, url);
       }
-
       request.send()
     }
 
@@ -160,7 +160,7 @@ var paginator = function() {
       console.log($('#nextPageUrl').attr('href'));
       if (currentPage + 1 >= lastPage) {
         nextChapter($('#nextPageUrl').attr('href'));
-        return false;
+        return;
       }
       currentPage++;
       var pagesRight = setPagersWidth();
@@ -216,9 +216,7 @@ var paginator = function() {
         if (xPos <= winW / 5) {
           prevPage();
         } else {
-          if (!nextPage()) {
-            $('#pager_container').unbind();
-          }
+          nextPage();
         }
       }));
     }
@@ -271,7 +269,7 @@ function initScript($) {
 function initStyle() {
   var style = document.createElement('style');
   style.type = 'text/css';
-  style.appendChild(document.createTextNode('#nextChapter{display:none} #pager_container{color:rgba(0,0,0,.87);background-color:#fff;transition:all 450ms cubic-bezier(.23,1,.32,1) 0s;box-sizing:border-box;box-shadow:rgba(0,0,0,.12) 0 1px 6px,rgba(0,0,0,.12) 0 1px 4px;border-radius:0;height:100%;overflow:hidden;position:absolute;padding:10px 10px 20px;left:50%;z-index:20}'));
+  style.appendChild(document.createTextNode('#nextChapterContent{display:none;} #nextChapter{display:none} #pager_container{color:rgba(0,0,0,.87);background-color:#fff;transition:all 450ms cubic-bezier(.23,1,.32,1) 0s;box-sizing:border-box;box-shadow:rgba(0,0,0,.12) 0 1px 6px,rgba(0,0,0,.12) 0 1px 4px;border-radius:0;height:100%;overflow:hidden;position:absolute;padding:10px 10px 20px;left:50%;z-index:20}'));
   document.getElementsByTagName('head')[0].appendChild(style);
   jQuery(
     function($) {
