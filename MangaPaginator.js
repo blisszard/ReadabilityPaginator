@@ -30,7 +30,7 @@
  * @Author: Steven Chandswang
  * @Date:   2017-08-16
  * @Last Modified by:   Steve Chan
- * @Last Modified time: 2020-03-13
+ * @Last Modified time: 2020-03-26
  */
 console.clear();
 var paginator = function() {
@@ -123,10 +123,9 @@ var paginator = function() {
         // return $("<p></p>").append(element);
       }).get().join('');
       var $nextPageUrl = $('.navi-change-chapter-btn-next').attr('href');
-      document.body.innerHTML = '<a id="nextPageUrl" href="' + $nextPageUrl + '">Next</a><div id="pager_container" style=""><div id="pages_5NPJADvYjZY" style="right: 0px; ">' + $content + '</div></div>';
+      document.body.innerHTML = '<div id="pager_container" style=""><div id="pages_5NPJADvYjZY" style="right: 0px; ">' + $content + '</div></div><div id="nextChapterContent"></div><a id="nextPageUrl" href="' + $nextPageUrl + '">Next</a>';
       initPager();
     }
-
     $(document).ready(function() {
       initPager();
     });
@@ -140,9 +139,16 @@ var paginator = function() {
       request.open('GET', url, true)
       request.onload = function() {
         nextContent = request.responseText;
-        $('body').append(nextContent);
-        var $nextPageUrl = $('.navi-change-chapter-btn-next').attr('href');
-        reloadScript();
+        $('#nextChapterContent').html(nextContent);
+        $('#nextChapterContent').ready(function() {
+          $("body").on('DOMSubtreeModified', "#nextChapterContent", function() {
+            var $nextPageUrl = $('.navi-change-chapter-btn-next').attr('href');
+            if ($nextPageUrl === undefined) {
+              alert('No More');
+            }
+            reloadScript();
+          });
+        });
         history.pushState({}, null, url);
       }
 
@@ -154,10 +160,11 @@ var paginator = function() {
       console.log($('#nextPageUrl').attr('href'));
       if (currentPage + 1 >= lastPage) {
         nextChapter($('#nextPageUrl').attr('href'));
-        return;
+        return false;
       }
       currentPage++;
       var pagesRight = setPagersWidth();
+      return true;
       // console.log('pagesRight:', pagesRight, ' currentPage:', currentPage);
     }
 
@@ -178,8 +185,22 @@ var paginator = function() {
       return width;
     }
 
+    function cancelDuplicates(fn, threshhold, scope) {
+      if (typeof threshhold !== 'number') threshhold = 200;
+      var last = 0;
+
+      return function() {
+        var now = +new Date;
+
+        if (now >= last + threshhold) {
+          last = now;
+          fn.apply(scope || this, arguments);
+        }
+      };
+    }
+
     function setPageClicker() {
-      $('#pager_container').on('touchend click', function(e) {
+      $('#pager_container').on('touchend click', cancelDuplicates(function(e) {
         var winW = ($(window).width());
         var xPos = e.pageX;
         if (xPos === undefined) {
@@ -195,9 +216,11 @@ var paginator = function() {
         if (xPos <= winW / 5) {
           prevPage();
         } else {
-          nextPage();
+          if (!nextPage()) {
+            $('#pager_container').unbind();
+          }
         }
-      });
+      }));
     }
 
     $(window).bind('keydown', function(e) {
@@ -283,7 +306,7 @@ document.head.innerHTML = '<meta charset="utf-8"><meta name="viewport" content="
 // injectJQ();
 loadScript("https://code.jquery.com/jquery-2.1.0.min.js", function() {
   jQuery(function($) {
-    var $content = $('#vungdoc,div.container-chapter-reader').children('img').map(function(index, element) {
+    var $content = $('#vungdoc,div.container-chapter-reader,div.pages,div.ng-scope').children('img').map(function(index, element) {
       console.log(element.outerHTML);
       // debugger;
       return "<p>" + element.outerHTML + "</p>";
@@ -293,10 +316,9 @@ loadScript("https://code.jquery.com/jquery-2.1.0.min.js", function() {
       // return $("<p></p>").append(element);
     }).get().join('');
     var $nextPageUrl = $('.navi-change-chapter-btn-next').attr('href');
-    // debugger;
     //   // document.body.innerHTML = '<div id="readability_article" style="display:none;">' + article.content + '</div>';
     //   // var content = $('#readability-page-1').html();
-    document.body.innerHTML = '<div id="pager_container" style=""><div id="pages_5NPJADvYjZY" style="right: 0px; ">' + $content + '</div></div><a id="nextPageUrl" href="' + $nextPageUrl + '">Next</a>';
+    document.body.innerHTML = '<div id="pager_container" style=""><div id="pages_5NPJADvYjZY" style="right: 0px; ">' + $content + '</div></div><div id="nextChapterContent"></div><a id="nextPageUrl" href="' + $nextPageUrl + '">Next</a>';
     // $('.readability-styled').attr('style', '');
     initStyle();
     initScript($);
