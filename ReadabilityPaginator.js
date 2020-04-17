@@ -30,7 +30,7 @@
  * @Author: Steven Chandswang
  * @Date:   2017-08-16
  * @Last Modified by:   Steve Chan
- * @Last Modified time: 2019-07-16
+ * @Last Modified time: 2020-04-17
  */
 console.clear();
 var paginator = function() {
@@ -240,21 +240,22 @@ function loadScript(url, callback) {
   script.src = url;
   document.getElementsByTagName("head")[0].appendChild(script);
 }
+loadScript("https://code.jquery.com/jquery-2.1.0.min.js", function() {
+  jQuery(function($) {
+    $('P:hidden').remove();
+    loadScript("https://cdn.rawgit.com/blisszard/readability/development/Readability.min.js", function() {
+      var loc = document.location;
+      var uri = {
+        spec: loc.href,
+        host: loc.host,
+        prePath: loc.protocol + "//" + loc.host,
+        scheme: loc.protocol.substr(0, loc.protocol.indexOf(":")),
+        pathBase: loc.protocol + "//" + loc.host + loc.pathname.substr(0, loc.pathname.lastIndexOf("/") + 1)
+      };
+      var article = new Readability(uri, document).parse();
+      document.head.innerHTML = '<meta charset="utf-8"><meta name="viewport" content="width=device-width" />';
+      injectJQ();
 
-loadScript("https://cdn.rawgit.com/blisszard/readability/development/Readability.min.js", function() {
-  var loc = document.location;
-  var uri = {
-    spec: loc.href,
-    host: loc.host,
-    prePath: loc.protocol + "//" + loc.host,
-    scheme: loc.protocol.substr(0, loc.protocol.indexOf(":")),
-    pathBase: loc.protocol + "//" + loc.host + loc.pathname.substr(0, loc.pathname.lastIndexOf("/") + 1)
-  };
-  var article = new Readability(uri, document).parse();
-  document.head.innerHTML = '<meta charset="utf-8"><meta name="viewport" content="width=device-width" />';
-  injectJQ();
-  loadScript("https://code.jquery.com/jquery-2.1.0.min.js", function() {
-    jQuery(function($) {
       document.body.innerHTML = '<div id="readability_article" style="display:none;">' + article.content + '</div>';
       var content = $('#readability-page-1').html();
       document.body.innerHTML = '<div id="pager_container" style=""><div id="pages_5NPJADvYjZY" style="right: 0px; ">' + content + '</div></div>';
