@@ -30,7 +30,7 @@
  * @Author: Steven Chandswang
  * @Date:   2017-08-16
  * @Last Modified by:   Steve Chan
- * @Last Modified time: 2020-04-17
+ * @Last Modified time: 2020-04-20
  */
 console.clear();
 var paginator = function() {
@@ -243,6 +243,10 @@ function loadScript(url, callback) {
 loadScript("https://code.jquery.com/jquery-2.1.0.min.js", function() {
   jQuery(function($) {
     $('P:hidden').remove();
+    $('P').filter(function() {
+      return $(this).css('position') == 'fixed'
+    }).remove();
+    // $('p:has(a)').remove();
     loadScript("https://cdn.rawgit.com/blisszard/readability/development/Readability.min.js", function() {
       var loc = document.location;
       var uri = {
